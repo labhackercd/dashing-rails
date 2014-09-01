@@ -32,20 +32,25 @@ class Dashing.Widget extends Batman.View
 
     super
 
-    @observe 'node', (newValue, oldValue) ->
-      if !oldValue && !@_registeredAtDashing
-        @_registeredAtDashing = true
+    # In newer Batman versions, the node is only set *after*
+    # the view is initialized, so we have to observe the view
+    # in order to register it into Dashing when the node is set
+    @observe 'node', (node) =>
+      @_registerWidget() if node
 
-        @mixin($(@node).data())
-        Dashing.widgets[@id] ||= []
-        Dashing.widgets[@id].push(@)
+  _registerWidget: ->
+    @mixin($(@node).data())
 
-        # in case the events from the server came
-        # before the widget was rendered
-        @mixin(Dashing.lastEvents[@id]) 
+    Dashing.widgets[@id] ||= []
+    Dashing.widgets[@id].push(@)
 
-        type = Batman.Filters.dashize(@constructor.name)
-        $(@node).addClass("widget widget-#{type} #{@id}")
+    # in case the events from the server came
+    # before the widget was rendered
+    lastEvent = Dashing.lastEvents[@id]
+    @receiveData(lastEvent)
+
+    type = Batman.Filters.dashize(@constructor.name)
+    $(@node).addClass("widget widget-#{type} #{@id}")
 
   @accessor 'updatedAtMessage', ->
     if updatedAt = @get('updatedAt')

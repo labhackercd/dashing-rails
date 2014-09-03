@@ -18,10 +18,17 @@ module Dashing
       files.sort.first
     end
 
-    def send_event(id, data)
-      redis.publish("#{Dashing.config.redis_namespace}.create", data.merge(id: id, updatedAt: Time.now.utc.to_i).to_json)
-    end
+    def send_event(id, data, cache = false)
+      data = data.merge(id: id, updatedAt: Time.now.utc.to_i).to_json
 
+      # publish the event
+      redis.publish("#{Dashing.config.redis_namespace}.create", data)
+
+      # cache the event into Redis
+      if cache
+        redis.set("#{Dashing.config.redis_namespace}:#{id}", data)
+      end
+    end
   end
 end
 

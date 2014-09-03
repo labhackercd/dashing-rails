@@ -9,11 +9,19 @@ module Dashing
       response.headers['X-Accel-Buffering'] = 'no'
 
       @redis = Dashing.redis
+
+      # Stream all cached events before anything else
+      @redis.keys("#{Dashing.config.redis_namespace}:*").each do |key|
+        response.stream.write("data: #{@redis.get(key)}\n\n")
+      end
+
+      # Subscribe to stream live events
       @redis.psubscribe("#{Dashing.config.redis_namespace}.*") do |on|
         on.pmessage do |pattern, event, data|
           response.stream.write("data: #{data}\n\n")
         end
       end
+
     rescue IOError
       logger.info "[Dashing][#{Time.now.utc.to_s}] Stream closed"
     ensure

@@ -26,6 +26,9 @@ class window.Dashing extends Batman.App
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
 
 class Dashing.Widget extends Batman.View
+
+  hasData: false
+
   constructor: ->
     # Set the view path
     @constructor::source = Batman.Filters.underscore(@constructor.name)
@@ -47,7 +50,7 @@ class Dashing.Widget extends Batman.View
     # in case the events from the server came
     # before the widget was rendered
     lastEvent = Dashing.lastEvents[@id]
-    @receiveData(lastEvent)
+    @receiveData(lastEvent) if lastEvent
 
     type = Batman.Filters.dashize(@constructor.name)
     $(@node).addClass("widget widget-#{type} #{@id}")
@@ -59,15 +62,11 @@ class Dashing.Widget extends Batman.View
       minutes = ("0" + timestamp.getMinutes()).slice(-2)
       "Last updated at #{hours}:#{minutes}"
 
-  @::on 'ready', ->
-    Dashing.Widget.fire 'ready'
-
-  receiveData: (data) =>
+  receiveData: (data) ->
     @mixin(data)
-    @onData(data)
+    @hasData = true
+    @fireAndCall 'data', data
 
-  onData: (data) =>
-    # Widgets override this to handle incoming data
 
 Dashing.AnimatedValue =
   get: Batman.Property.defaultAccessor.get

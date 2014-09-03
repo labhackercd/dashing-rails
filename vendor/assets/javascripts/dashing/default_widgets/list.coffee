@@ -1,5 +1,5 @@
 class Dashing.List extends Dashing.Widget
-  ready: ->
+  @::on 'ready', ->
     if @get('unordered')
       $(@node).find('ol').remove()
     else

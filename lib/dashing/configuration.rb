@@ -1,4 +1,3 @@
-require 'rufus-scheduler'
 require 'redis'
 require 'connection_pool'
 
@@ -11,11 +10,10 @@ module Dashing
     attr_accessor :jobs_path
     attr_accessor :default_dashboard, :dashboards_views_path, :dashboard_layout_path
     attr_accessor :widgets_views_path, :widgets_js_path, :widgets_css_path
-    attr_accessor :engine_path, :scheduler
+    attr_accessor :engine_path
 
     def initialize
       @engine_path            = '/dashing'
-      @scheduler              = ::Rufus::Scheduler.new
 
       # Redis
       @redis_host             = '127.0.0.1'

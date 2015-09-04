@@ -1,4 +1,5 @@
 require 'redis'
+require 'uri'
 require 'connection_pool'
 
 module Dashing

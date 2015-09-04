@@ -16,7 +16,7 @@ module Dashing
       @engine_path            = '/dashing'
 
       # Redis
-      @redis_host             = '127.0.0.1'
+      @redis_host             = ENV['REDIS-URL']
       @redis_port             = '6379'
       @redis_password         = nil
       @redis_namespace        = 'dashing_events'
@@ -45,7 +45,8 @@ module Dashing
     end
 
     def new_redis_connection
-      ::Redis.new(host: redis_host, port: redis_port, password: redis_password)
+       uri = URI.parse(ENV["REDIS_URL"])
+       $redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
     end
 
     private

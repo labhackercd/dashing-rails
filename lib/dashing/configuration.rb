@@ -16,9 +16,9 @@ module Dashing
       @engine_path            = '/dashing'
 
       # Redis
-      @redis_host             = ENV['REDIS-URL']
-      @redis_port             = '6379'
-      @redis_password         = nil
+      @redis_host             = URI.parse(ENV["REDIS_URL"]).host
+      @redis_port             = URI.parse(ENV["REDIS_URL"]).port
+      @redis_password         = URI.parse(ENV["REDIS_URL"]).password
       @redis_namespace        = 'dashing_events'
       @redis_timeout          = 3
 
